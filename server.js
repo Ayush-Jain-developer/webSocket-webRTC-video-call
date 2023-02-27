@@ -1,14 +1,14 @@
-const fs = require('fs')
-const key = fs.readFileSync(
-  '/Users/admin/localcert/localhost/localhost.decrypted.key'
-)
-const cert = fs.readFileSync('/Users/admin/localcert/localhost/localhost.crt')
 
+const fs = require('fs')
+const path = require("path")
 const express = require('express')
 const app = express()
 const https = require('https')
-// const server = require('http').createServer(app)
-const server = https.createServer({ key, cert }, app)
+const server = require('http').Server(app)
+// const server = https.createServer({
+//   key : fs.readFileSync(path.join(__dirname,'cert','key.pem')),
+//   cert : fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
+// }, app)
 const io = require('socket.io')(server)
 const { v4: uuidV4 } = require('uuid')
 
@@ -26,11 +26,13 @@ app.get('/:room', (req, res) => {
 io.on('connection', (socket) => {
   socket.on('join-room', (roomId, userId) => {
     socket.join(roomId)
-    socket.to(roomId).emit('user-connected', userId)
+    socket.to(roomId).broadcast.emit('user-connected', userId)
     socket.on('disconnect', () => {
-      socket.to(roomId).emit('user-disconnected', userId)
+      socket.to(roomId).broadcast.emit('user-disconnected', userId)
     })
   })
 })
 
-server.listen(4000)
+server.listen(4000,()=>{
+  console.log("Secure server listening on port 4000");
+} )
