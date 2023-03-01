@@ -4,7 +4,7 @@ const path = require("path")
 const express = require('express')
 const app = express()
 const https = require('https')
-// const server = require('http').Server(app)
+//const server = require('http').Server(app)
 const server = https.createServer({
   key : fs.readFileSync(path.join(__dirname,'cert','key.pem')),
   cert : fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
@@ -24,12 +24,12 @@ app.get('/:room', (req, res) => {
 })
 
 io.on('connection', socket => {
-  socket.on('join-room', (roomId, userId) => {
+    socket.on('join-room', (roomId, userId) => {
     socket.join(roomId)
-    socket.to(roomId).broadcast.emit('user-connected', userId)
+    socket.to(roomId).emit('user-connected', userId)
     
-    socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userId)
+      socket.on('disconnect', () => {
+      socket.to(roomId).emit('user-disconnected', userId)
     })
   })
 })
