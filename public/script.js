@@ -1,6 +1,9 @@
 const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
 const myPeer = new Peer(undefined, {
+  config: {'iceServers': [
+	  { url: 'stun:stun.l.google.com:19302' }
+	]},
   host: 'https://webrtc.techvalens.com/',
   secure:true,
   port: '3001'
